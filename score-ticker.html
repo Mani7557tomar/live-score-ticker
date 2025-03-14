@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Cricket Score Ticker</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .ticker-container {
+            width: 100%;
+            overflow: hidden;
+            background: black;
+            color: white;
+            padding: 10px 0;
+            white-space: nowrap;
+        }
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll 10s linear infinite;
+        }
+        @keyframes scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="ticker-container">
+        <div class="ticker-content" id="ticker">
+            Loading live cricket scores...
+        </div>
+    </div>
+
+    <script>
+        async function fetchLiveScores() {
+            try {
+                const response = await fetch("https://api.cricapi.com/v1/currentMatches?apikey=YOUR_API_KEY");
+                const data = await response.json();
+
+                if (!data || !data.data) {
+                    document.getElementById("ticker").textContent = "No live matches currently.";
+                    return;
+                }
+
+                let scores = data.data.map(match => 
+                    `${match.name}: ${match.status}`
+                );
+
+                document.getElementById("ticker").textContent = scores.join(" | ");
+            } catch (error) {
+                console.error("Error fetching live cricket scores:", error);
+                document.getElementById("ticker").textContent = "Error loading scores.";
+            }
+        }
+
+        fetchLiveScores();
+        setInterval(fetchLiveScores, 10000); // Update every 10 seconds
+    </script>
+</body>
+</html>
